@@ -1,11 +1,8 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"os"
-
-	klog "k8s.io/klog/v2"
 )
 
 // TODO: Use Cobra and Viper to setup cli
@@ -16,9 +13,6 @@ import (
 // TODO: Enssure only ever running once, use a pid file?
 
 func main() {
-	klog.InitFlags(nil)
-	flag.Parse()
-
 	cli, err := ProvideCLI()
 	if err != nil {
 		fmt.Println(err.Error())
