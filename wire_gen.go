@@ -11,7 +11,7 @@ import (
 	"github.com/tomato-net/vault-agent/cli"
 	"github.com/tomato-net/vault-agent/config"
 	"github.com/tomato-net/vault-agent/logger"
-	"github.com/tomato-net/vault-agent/renewer"
+	"github.com/tomato-net/vault-agent/token"
 )
 
 // Injectors from wire.go:
@@ -21,11 +21,13 @@ func ProvideCLI() (*cobra.Command, error) {
 	if err != nil {
 		return nil, err
 	}
-	logrLogger := logger.New()
-	renewerRenewer, err := renewer.New(configConfig, logrLogger)
+	client, err := token.NewClient(configConfig)
 	if err != nil {
 		return nil, err
 	}
-	command := cli.New(renewerRenewer, logrLogger)
+	logrLogger := logger.New()
+	providerLDAP := token.NewProviderLDAP(client, logrLogger, configConfig)
+	renewer := token.NewRenewer(client, logrLogger, providerLDAP, configConfig)
+	command := cli.New(renewer, logrLogger)
 	return command, nil
 }

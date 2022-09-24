@@ -5,11 +5,11 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/spf13/cobra"
-	"github.com/tomato-net/vault-agent/renewer"
+	"github.com/tomato-net/vault-agent/token"
 )
 
-func New(r *renewer.Renewer, log logr.Logger) *cobra.Command {
-	return &cobra.Command{
+func New(r *token.Renewer, log logr.Logger) *cobra.Command {
+	cmd := &cobra.Command{
 		Use: "vault-agent",
 		RunE: func(c *cobra.Command, args []string) error {
 			log.Info("starting renewer")
@@ -20,6 +20,20 @@ func New(r *renewer.Renewer, log logr.Logger) *cobra.Command {
 			}
 
 			log.Info("finishing")
+			return nil
+		},
+	}
+
+	cmd.AddCommand(NewStatus(log))
+
+	return cmd
+}
+
+func NewStatus(log logr.Logger) *cobra.Command {
+	return &cobra.Command{
+		Use: "status",
+		RunE: func(c *cobra.Command, args []string) error {
+			log.Info("running!")
 			return nil
 		},
 	}
