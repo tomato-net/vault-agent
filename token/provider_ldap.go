@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/vault/api"
 	"github.com/hashicorp/vault/api/auth/ldap"
 	"github.com/tomato-net/vault-agent/config"
+	"github.com/tomato-net/vault-agent/credentials"
 )
 
 var _ Provider = (*ProviderLDAP)(nil)
@@ -16,18 +17,25 @@ type ProviderLDAP struct {
 	client *api.Client
 	logger logr.Logger
 	config config.Config
+	creds  credentials.Reader
 }
 
-func NewProviderLDAP(client *api.Client, logger logr.Logger, config config.Config) *ProviderLDAP {
+func NewProviderLDAP(client *api.Client, logger logr.Logger, config config.Config, creds credentials.Reader) *ProviderLDAP {
 	return &ProviderLDAP{
 		client: client,
 		logger: logger.WithName("provider_ldap"),
 		config: config,
+		creds:  creds,
 	}
 }
 
 func (l *ProviderLDAP) Token() (Token, error) {
-	ldapAuth, err := ldap.NewLDAPAuth(l.config.Username(), &ldap.Password{FromString: l.config.Password()})
+	password, err := l.creds.Read()
+	if err != nil {
+		return Token{}, fmt.Errorf("credentials provider: %w", err)
+	}
+
+	ldapAuth, err := ldap.NewLDAPAuth(l.config.Username(), &ldap.Password{FromString: password.Data})
 	if err != nil {
 		return Token{}, fmt.Errorf("new ldap auth: %w", err)
 	}

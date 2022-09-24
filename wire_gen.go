@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/tomato-net/vault-agent/cli"
 	"github.com/tomato-net/vault-agent/config"
+	"github.com/tomato-net/vault-agent/credentials"
 	"github.com/tomato-net/vault-agent/logger"
 	"github.com/tomato-net/vault-agent/token"
 )
@@ -17,6 +18,7 @@ import (
 // Injectors from wire.go:
 
 func ProvideCLI() (*cobra.Command, error) {
+	logrLogger := logger.New()
 	configConfig, err := config.New()
 	if err != nil {
 		return nil, err
@@ -25,9 +27,9 @@ func ProvideCLI() (*cobra.Command, error) {
 	if err != nil {
 		return nil, err
 	}
-	logrLogger := logger.New()
-	providerLDAP := token.NewProviderLDAP(client, logrLogger, configConfig)
+	keychainAccessor := credentials.NewKeychainAccessor(configConfig)
+	providerLDAP := token.NewProviderLDAP(client, logrLogger, configConfig, keychainAccessor)
 	renewer := token.NewRenewer(client, logrLogger, providerLDAP, configConfig)
-	command := cli.New(renewer, logrLogger)
+	command := cli.New(logrLogger, renewer, keychainAccessor)
 	return command, nil
 }
