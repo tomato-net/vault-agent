@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/spf13/viper"
 )
@@ -11,6 +10,7 @@ const (
 	KeyVaultAddress key = "vault_address"
 	KeyUsername         = "username"
 	KeyPassword         = "password"
+	KeyTokenFile        = "token_file"
 )
 
 type key string
@@ -27,6 +27,7 @@ type Config interface {
 	VaultAddress() string
 	Username() string
 	Password() string
+	TokenFile() string
 }
 
 type config struct{}
@@ -45,14 +46,6 @@ func New() (Config, error) {
 	return &config{}, nil
 }
 
-func Must(c Config, err error) Config {
-	if err != nil {
-		os.Exit(1)
-	}
-
-	return c
-}
-
 func (c *config) VaultAddress() string {
 	return get[string](KeyVaultAddress)
 }
@@ -63,6 +56,10 @@ func (c *config) Username() string {
 
 func (c *config) Password() string {
 	return get[string](KeyPassword)
+}
+
+func (c *config) TokenFile() string {
+	return get[string](KeyTokenFile)
 }
 
 func get[T any](k key) T {

@@ -11,6 +11,7 @@ import (
 	"github.com/tomato-net/vault-agent/cli"
 	"github.com/tomato-net/vault-agent/config"
 	"github.com/tomato-net/vault-agent/logger"
+	"github.com/tomato-net/vault-agent/renewer"
 )
 
 // Injectors from wire.go:
@@ -21,6 +22,10 @@ func ProvideCLI() (*cobra.Command, error) {
 		return nil, err
 	}
 	logrLogger := logger.New()
-	command := cli.New(configConfig, logrLogger)
+	renewerRenewer, err := renewer.New(configConfig, logrLogger)
+	if err != nil {
+		return nil, err
+	}
+	command := cli.New(renewerRenewer, logrLogger)
 	return command, nil
 }

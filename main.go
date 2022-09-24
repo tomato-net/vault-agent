@@ -25,5 +25,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	cli.Execute()
+	if err := cli.Execute(); err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
 }
