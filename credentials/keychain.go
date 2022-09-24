@@ -28,7 +28,7 @@ func (a *KeychainAccessor) Read() (PasswordCredential, error) {
 	query.SetMatchLimit(keychain.MatchLimitOne)
 	query.SetReturnData(true)
 
-	results, err := keychain.QueryItem(query)
+	results, err := _keychainQueryItem(query)
 	if err != nil {
 		return PasswordCredential{}, fmt.Errorf("read: %w", err)
 	}
@@ -43,6 +43,7 @@ func (a *KeychainAccessor) Read() (PasswordCredential, error) {
 
 func (a *KeychainAccessor) Has() (bool, error) {
 	cred, err := a.Read()
+	// TODO: Don't return err on not found err
 	if err != nil {
 		return false, fmt.Errorf("read: %w", err)
 	}
@@ -62,7 +63,7 @@ func (a *KeychainAccessor) Write(credential PasswordCredential) error {
 	item.SetSynchronizable(keychain.SynchronizableNo)
 	item.SetAccessible(keychain.AccessibleWhenUnlocked)
 
-	err := keychain.AddItem(item)
+	err := _keychainAddItem(item)
 	if err != nil {
 		return fmt.Errorf("add item: %w", err)
 	}
@@ -77,7 +78,7 @@ func (a *KeychainAccessor) Delete() error {
 	}
 
 	item := keychainItem(account)
-	if err := keychain.DeleteItem(item); err != nil {
+	if err := _keychainDeleteItem(item); err != nil {
 		return fmt.Errorf("delete item: %w", err)
 	}
 
@@ -85,7 +86,7 @@ func (a *KeychainAccessor) Delete() error {
 }
 
 func keychainItem(account string) keychain.Item {
-	item := keychain.NewItem()
+	item := _keychainNewItem()
 	item.SetSecClass(keychain.SecClassGenericPassword)
 	item.SetService("vault-agent.tomato-net.github.com")
 	item.SetLabel("vault agent credentials")

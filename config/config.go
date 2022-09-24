@@ -26,7 +26,6 @@ var _getter Getter = viper.Get
 type Config interface {
 	VaultAddress() string
 	Username() string
-	Password() string
 	TokenFile() string
 }
 
@@ -52,10 +51,6 @@ func (c *config) VaultAddress() string {
 
 func (c *config) Username() string {
 	return get[string](KeyUsername)
-}
-
-func (c *config) Password() string {
-	return get[string](KeyPassword)
 }
 
 func (c *config) TokenFile() string {
