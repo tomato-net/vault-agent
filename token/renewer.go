@@ -36,7 +36,7 @@ func (r *Renewer) Start() error {
 
 	r.client.SetToken(token.Token)
 	// TODO: Username metadata required, can it be gained from provider token?
-	secret, err := r.client.Auth().Token().Create(&api.TokenCreateRequest{TTL: "30s", Metadata: map[string]string{"username": r.config.Username()}, ExplicitMaxTTL: "60s"})
+	secret, err := r.client.Auth().Token().Create(&api.TokenCreateRequest{Metadata: map[string]string{"username": r.config.Username()}})
 	if err != nil {
 		return fmt.Errorf("create token: %w", err)
 	}
@@ -77,7 +77,7 @@ func (r *Renewer) Start() error {
 				r.logger.Info("successfully looked up self")
 			}
 
-			time.Sleep(10 * time.Second)
+			time.Sleep(10 * time.Minute)
 		}
 	})
 
