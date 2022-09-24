@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"os"
+	"fmt"
 
 	"github.com/go-logr/logr"
 	"github.com/spf13/cobra"
@@ -13,13 +13,26 @@ func New(r *token.Renewer, log logr.Logger) *cobra.Command {
 		Use: "vault-agent",
 		RunE: func(c *cobra.Command, args []string) error {
 			log.Info("starting renewer")
-			defer r.Stop()
-			if err := r.Start(); err != nil {
-				log.Error(err, "renewer failed")
-				os.Exit(1)
+
+			start := func() error {
+				if err := r.Start(); err != nil {
+					return fmt.Errorf("renewer failed: %w", err)
+				}
+
+				defer r.Stop()
+
+				return nil
 			}
 
-			log.Info("finishing")
+			for {
+				log.Info("generating new token renewer")
+
+				if err := start(); err != nil {
+					log.Error(err, "token renewer failed")
+				}
+			}
+
+			log.Info("vault-agent shutting down")
 			return nil
 		},
 	}

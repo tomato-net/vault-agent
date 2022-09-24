@@ -23,7 +23,7 @@ func NewRenewer(client *api.Client, logger logr.Logger, provider Provider, confi
 	return &Renewer{
 		client:   client,
 		config:   config,
-		logger:   logger,
+		logger:   logger.WithName("renewer"),
 		provider: provider,
 	}
 }
@@ -35,8 +35,8 @@ func (r *Renewer) Start() error {
 	}
 
 	r.client.SetToken(token.Token)
-	// TODO: Is this necessary?
-	secret, err := r.client.Auth().Token().Create(&api.TokenCreateRequest{TTL: "100"})
+	// TODO: Username metadata required, can it be gained from provider token?
+	secret, err := r.client.Auth().Token().Create(&api.TokenCreateRequest{TTL: "30s", Metadata: map[string]string{"username": r.config.Username()}, ExplicitMaxTTL: "60s"})
 	if err != nil {
 		return fmt.Errorf("create token: %w", err)
 	}

@@ -21,7 +21,7 @@ type ProviderLDAP struct {
 func NewProviderLDAP(client *api.Client, logger logr.Logger, config config.Config) *ProviderLDAP {
 	return &ProviderLDAP{
 		client: client,
-		logger: logger,
+		logger: logger.WithName("provider_ldap"),
 		config: config,
 	}
 }

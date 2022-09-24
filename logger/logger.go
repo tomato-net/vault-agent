@@ -6,5 +6,5 @@ import (
 )
 
 func New() logr.Logger {
-	return klogr.New().WithName("MyName")
+	return klogr.New()
 }
