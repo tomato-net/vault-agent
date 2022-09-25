@@ -19,6 +19,9 @@ type Renewer struct {
 	provider Provider
 }
 
+// TODO: Separate Auth from token renewing, while supporting reauth errors
+// TODO: Present channels in API?
+// TODO: Run go routine to validate lookupself that comms on channel to trigger reauth
 func NewRenewer(client *api.Client, logger logr.Logger, provider Provider, config config.Config) *Renewer {
 	return &Renewer{
 		client:   client,
